@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}RZA - Login{% endblock %}
+
+{% block content %}
+
+<main class="auth-layout">
+
+    {# Left side image, background set via CSS based on this class #}
+    <div class="auth-image auth-image-login"></div>
+
+    {# Right side: login card #}
+    <section class="auth-card">
+        <h1>Sign in</h1>
+
+        {# 
+            Login form
+            - Uses IDs so JavaScript can read values and validate them
+            - action="" means the same route will process POST in Flask
+        #}
+        <form id="loginForm" method="post">
+            {{ form_csrf_token|safe if form_csrf_token else "" }}
+
+            <label for="loginEmail">Email address</label>
+            <input type="email"
+                   id="loginEmail"
+                   name="email"
+                   required>
+
+            <label for="loginPassword">Your password</label>
+            <input type="password"
+                   id="loginPassword"
+                   name="password"
+                   required>
+
+            <button type="submit" class="btn btn-primary auth-btn">
+                Sign in
+            </button>
+
+            <p class="auth-meta">
+                Don’t have an account?
+                <a href="{{ url_for('signup') }}">Sign up</a>
+            </p>
+
+            {# 
+                Server-side error message:
+                - Flask can pass an `error` variable when login fails 
+            #}
+            {% if error %}
+                <p id="loginError" class="error-message">{{ error }}</p>
+            {% else %}
+                <p id="loginError" class="error-message"></p>
+            {% endif %}
+        </form>
+    </section>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

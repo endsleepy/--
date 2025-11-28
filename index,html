@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}RZA - Home{% endblock %}
+
+{% block content %}
+
+    {# HERO SECTION: big visual intro and CTA #}
+    <section class="hero">
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <h1>Learn. Grow. Explore — with Riget Zoo Adventures</h1>
+
+            <p>
+                A modern platform designed to help visitors book tickets, manage their stay,
+                and enjoy personalised experiences at the zoo.
+            </p>
+
+            {# CTA uses url_for to link into the booking flow #}
+            <a href="{{ url_for('rooms') }}" class="btn btn-primary hero-cta">
+                Book a ticket now!
+            </a>
+        </div>
+    </section>
+
+    {# ABOUT SECTION: explains context of the solution #}
+    <section class="about">
+        <h2>About us</h2>
+
+        <div class="about-grid">
+            <div class="about-image">
+                <img src="{{ url_for('static', filename='img/toucan.jpg') }}"
+                     alt="Toucan at Riget Zoo Adventures">
+            </div>
+
+            <div class="about-text">
+                <h3>Riget Zoo Adventures</h3>
+                <p>
+                    Riget Zoo Adventures is dedicated to providing a unique and memorable
+                    wildlife experience. The digital platform improves how visitors explore
+                    exhibits, learn about animals and plan their visit.
+                </p>
+                <p>
+                    Features such as online bookings and a loyalty scheme are designed to reduce
+                    queue times, minimise manual admin work and improve the overall experience.
+                </p>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

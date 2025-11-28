@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}RZA - Sign up{% endblock %}
+
+{% block content %}
+
+<main class="auth-layout">
+
+    <div class="auth-image auth-image-signup"></div>
+
+    <section class="auth-card">
+        <h1>Sign up now</h1>
+
+        {# 
+            Registration form
+            - Captures basic profile details
+            - Flask will process the POST to create a new user
+        #}
+        <form id="signupForm" method="post">
+            {{ form_csrf_token|safe if form_csrf_token else "" }}
+
+            <div class="grid-2">
+                <div>
+                    <label for="firstName">First name</label>
+                    <input type="text"
+                           id="firstName"
+                           name="first_name"
+                           required>
+                </div>
+                <div>
+                    <label for="lastName">Last name</label>
+                    <input type="text"
+                           id="lastName"
+                           name="last_name"
+                           required>
+                </div>
+            </div>
+
+            <label for="signupEmail">Email address</label>
+            <input type="email"
+                   id="signupEmail"
+                   name="email"
+                   required>
+
+            <label for="signupPassword">Password</label>
+            <input type="password"
+                   id="signupPassword"
+                   name="password"
+                   required>
+
+            <label for="signupConfirmPassword">Confirm password</label>
+            <input type="password"
+                   id="signupConfirmPassword"
+                   name="confirm_password"
+                   required>
+
+            <button type="submit" class="btn btn-primary auth-btn">
+                Sign up
+            </button>
+
+            <p class="auth-meta">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Log in</a>
+            </p>
+
+            {% if error %}
+                <p id="signupError" class="error-message">{{ error }}</p>
+            {% else %}
+                <p id="signupError" class="error-message"></p>
+            {% endif %}
+        </form>
+    </section>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}
