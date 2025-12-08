@@ -1,105 +1,63 @@
 # ---------------------------------------------
-# USER REGISTRATION (Riget Zoo Adventures)
+# SIGN UP / REGISTER
 # ---------------------------------------------
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """
-    Handles account creation for normal visitors.
-    - GET: show the registration form
-    - POST: validate form data and create a new user in the database
+    Handles account registration for Riget Zoo Adventures.
+    - GET: show the sign up form
+    - POST: validate input and create a new user
     """
 
-    # If the user has submitted the form
+    # If the form was submitted
     if request.method == 'POST':
-        # --------------------------
-        # 1. GET FORM DATA
-        # --------------------------
-        # These names MUST match your <input name="..."> in register.html
+        # 1. Get form data
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
 
-        # --------------------------
-        # 2. BASIC VALIDATION
-        # --------------------------
-        # We build up an error list and show everything at once if needed
-        errors = []
+        # 2. Validation
+        error = None
 
-        # Check required fields
-        if not first_name:
-            errors.append("First name is required.")
-        if not last_name:
-            errors.append("Last name is required.")
-        if not email:
-            errors.append("Email address is required.")
-        if not password:
-            errors.append("Password is required.")
+        if not first_name or not last_name or not email or not password or not confirm_password:
+            error = "All fields are required."
+        elif "@" not in email:
+            error = "Please enter a valid email address."
+        elif len(password) < 8:
+            error = "Password must be at least 8 characters long."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        else:
+            # 3. Check if email already exists in database
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                error = "An account with that email already exists."
 
-        # Simple email format check
-        if email and "@" not in email:
-            errors.append("Please enter a valid email address.")
+        # 4. If there is an error → re-render template with error message
+        if error:
+            # This will populate {{ error }} in your signup template
+            return render_template("signup.html", error=error)
 
-        # Password rules (you can change min length)
-        if password and len(password) < 8:
-            errors.append("Password must be at least 8 characters long.")
+        # 5. If no errors → hash password and create user
+        hashed_pw = bcrypt.generate_password_hash(password).decode("utf-8")
 
-        # Confirm password matches
-        if password != confirm_password:
-            errors.append("Password and confirmation do not match.")
-
-        # --------------------------
-        # 3. IF THERE ARE ERRORS → SHOW THEM
-        # --------------------------
-        if errors:
-            # flash each error so they can be displayed on the page
-            for msg in errors:
-                flash(msg, "error")
-            # Redirect back to the registration form
-            return redirect(url_for('register'))
-
-        # --------------------------
-        # 4. CHECK IF EMAIL ALREADY EXISTS
-        # --------------------------
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            flash("An account with that email already exists.", "error")
-            return redirect(url_for('register'))
-
-        # --------------------------
-        # 5. HASH PASSWORD
-        # --------------------------
-        # Hash the plain text password before saving for security (GDPR / best practice)
-        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
-
-        # --------------------------
-        # 6. CREATE NEW USER OBJECT
-        # --------------------------
-        # This assumes your User model has at least:
-        # first_name, last_name, email, password, role, loyalty_points
         new_user = User(
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password=hashed_pw,     # store hashed password, NEVER plain text
-            role='visitor',         # default role for your zoo system
-            loyalty_points=0        # start with 0 loyalty points
+            password=hashed_pw,
+            role="visitor"  # or "user" depending on how you named it
         )
 
-        # --------------------------
-        # 7. SAVE TO DATABASE
-        # --------------------------
-        db.session.add(new_user)   # stage the new user
-        db.session.commit()        # write changes to the database
+        # Save to DB
+        db.session.add(new_user)
+        db.session.commit()
 
-        # --------------------------
-        # 8. CONFIRMATION + REDIRECT
-        # --------------------------
+        # Feedback + redirect to login page
         flash("Account created successfully. You can now log in.", "success")
-        # After registration, send user to login page
         return redirect(url_for('login'))
 
-    # If GET request → just display the registration form template
-    return render_template('register.html')
+    # If GET request → show the empty form
+    return render_template("signup.html", error=None)
