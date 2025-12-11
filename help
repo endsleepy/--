@@ -1,0 +1,14 @@
+@app.route('/help')
+def help_page():
+    return render_template('help.html')
+
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>Help & Support</h1>
+  <p>This page will contain support information in a future version.</p>
+</main>
+{% endblock %}
+
+<a href="{{ url_for('help_page') }}" class="nav-item">Help</a>
